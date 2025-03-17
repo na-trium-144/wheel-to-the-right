@@ -232,6 +232,7 @@ class Fail(Phase):
     def __init__(self, app: "App"):
         pyxel.play(0, 2)
         app.score -= 5
+        app.combo = 0
         app.combo_slidein = pyxel.frame_count
         app.player_exists = False
         self.stopped_frame = pyxel.frame_count
