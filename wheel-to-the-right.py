@@ -22,7 +22,7 @@ class Enemy:
 
     def hit(self, app: "App"):
         if self.exists and not self.exploding:
-            pyxel.play(0, 2)
+            pyxel.play(3, 2)
             self.exploded_at = pyxel.frame_count
             app.bullet_y = None
             app.combo += 1
@@ -74,14 +74,16 @@ class App:
     player_vx: float
     player_exists: bool
     bullet_y: Optional[int]
+    bgm_playing: bool
 
     def __init__(self):
-        self.bullet_y = None
-        self.score = 0
-        init_stage(self, 1)
-        self.phase = Title(self)
         pyxel.init(128, 128, title="Wheel to the Right")
         pyxel.load("wheel-to-the-right.pyxres")
+        self.bullet_y = None
+        self.score = 0
+        self.bgm_playing = False
+        init_stage(self, 1)
+        self.phase = Title(self)
 
     def run(self):
         pyxel.run(self.update, self.draw)
@@ -156,6 +158,9 @@ class Ready(Phase):
         app.player_exists = True
         app.player_vx = 0
         app.shot_num += 1
+        if not app.bgm_playing:
+            pyxel.playm(0, loop=True)
+            app.bgm_playing = True
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
@@ -165,7 +170,7 @@ class Ready(Phase):
 
 class Moving(Phase):
     def __init__(self, app: "App"):
-        pyxel.play(0, 0, loop=True)
+        pyxel.play(3, 0, loop=True)
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btn(pyxel.KEY_SPACE) or pyxel.btn(pyxel.MOUSE_BUTTON_LEFT):
@@ -182,7 +187,7 @@ class Stop(Phase):
 
     def __init__(self, app: "App"):
         self.stopped_frame = pyxel.frame_count
-        pyxel.play(0, 5)
+        pyxel.play(3, 5)
 
     def update(self, app: "App") -> "Phase":
         if app.player_vx > 0:
@@ -201,7 +206,7 @@ class Fire(Phase):
     stopped_frame: int
 
     def __init__(self, app: "App"):
-        pyxel.play(0, 1)
+        pyxel.play(3, 1)
         app.bullet_y = 120
         app.combo = 0
         app.combo_slidein = None
@@ -230,7 +235,7 @@ class Fail(Phase):
     stopped_frame: int
 
     def __init__(self, app: "App"):
-        pyxel.play(0, 2)
+        pyxel.play(3, 2)
         app.score -= 5
         app.combo = 0
         app.combo_slidein = pyxel.frame_count
@@ -254,6 +259,9 @@ class Title(Phase):
     def __init__(self, app: "App"):
         app.player_exists = False  # hide player
         app.player_vx = 0
+        if not app.bgm_playing:
+            pyxel.playm(0, loop=True)
+            app.bgm_playing = True
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
@@ -266,8 +274,10 @@ class Title(Phase):
 class Clear(Phase):
     def __init__(self, app: "App"):
         app.score += app.max_shot_num - app.shot_num
-        pyxel.play(2, 3)
-        pyxel.play(3, 4)
+        pyxel.stop()
+        app.bgm_playing = False
+        pyxel.play(0, 3)
+        pyxel.play(1, 4)
 
     def update(self, app: "App") -> "Phase":
         if (
@@ -280,8 +290,10 @@ class Clear(Phase):
 
 class GameOver(Phase):
     def __init__(self, app: "App"):
-        pyxel.play(2, 6)
-        pyxel.play(3, 7)
+        pyxel.stop()
+        app.bgm_playing = False
+        pyxel.play(0, 6)
+        pyxel.play(1, 7)
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btnp(pyxel.KEY_SPACE):
