@@ -145,7 +145,7 @@ class App:
                 pyxel.text(64 - 4 * 22 / 2, 90, "Thank you for playing!", 7)
         if isinstance(self.phase, Title):
             pyxel.text(64 - 4 * 18 / 2, 30, "Wheel to the Right", 7)
-            pyxel.text(64 - 4 * 24 / 2, 40, "<Shooting + UFO Catcher>", 7)
+            pyxel.text(64 - 4 * 23 / 2, 40, "<Shooting + Crane Game>", 7)
             pyxel.text(64 - 4 * 21 / 2, 60, "(c) 2025 na-trium-144", 7)
             pyxel.text(64 - 4 * 23 / 2, 90, "Press [Space] to start!", 7)
         if isinstance(self.phase, GameOver):
