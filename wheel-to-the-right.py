@@ -158,7 +158,7 @@ class Ready(Phase):
         app.shot_num += 1
 
     def update(self, app: "App") -> "Phase":
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             return Moving(app)
         return self
 
@@ -168,7 +168,7 @@ class Moving(Phase):
         pyxel.play(0, 0, loop=True)
 
     def update(self, app: "App") -> "Phase":
-        if pyxel.btn(pyxel.KEY_SPACE):
+        if pyxel.btn(pyxel.KEY_SPACE) or pyxel.btn(pyxel.MOUSE_BUTTON_LEFT):
             app.player_vx = min(app.player_vx + 0.1, 1.5)
             app.player_x += app.player_vx
             if app.player_x > 128 - 4:
@@ -256,7 +256,7 @@ class Title(Phase):
         app.player_vx = 0
 
     def update(self, app: "App") -> "Phase":
-        if pyxel.btnp(pyxel.KEY_SPACE):
+        if pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             init_stage(app, 1)
             app.score = 0
             return Ready(app)
@@ -270,7 +270,9 @@ class Clear(Phase):
         pyxel.play(3, 4)
 
     def update(self, app: "App") -> "Phase":
-        if pyxel.btnp(pyxel.KEY_SPACE) and app.stage < STAGES_MAX:
+        if (
+            pyxel.btnp(pyxel.KEY_SPACE) or pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT)
+        ) and app.stage < STAGES_MAX:
             init_stage(app, app.stage + 1)
             return Ready(app)
         return self
@@ -288,6 +290,7 @@ class GameOver(Phase):
 
 
 STAGES_MAX = 5
+
 
 def init_stage(app: "App", stage: int) -> None:
     app.stage = stage
