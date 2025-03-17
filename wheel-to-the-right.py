@@ -22,6 +22,7 @@ class Enemy:
 
     def hit(self, app: "App"):
         if self.exists and not self.exploding:
+            pyxel.play(1, 2)
             self.exploded_at = pyxel.frame_count
             app.bullet_y = None
             app.combo += 1
@@ -83,6 +84,7 @@ class App:
         self.max_shot_num = 4
         self.phase = Ready(self)
         pyxel.init(128, 128, title="Hello Pyxel")
+        pyxel.load("wheel-to-the-right.pyxres")
 
     def run(self):
         pyxel.run(self.update, self.draw)
@@ -112,17 +114,24 @@ class App:
             if e.exploding:
                 pyxel.circ(e.x, e.y, e.exploding_radius(), 8)
             elif e.exists:
-                pyxel.rect(e.x - 3, e.y - 3, 6, 6, 14)
+                pyxel.blt(e.x - 4, e.y - 4, 0, 16, 0, 8, 8, colkey=0)
         if isinstance(self.phase, Fire) and self.bullet_y is not None:
-            pyxel.rect(self.player_x - 2, self.bullet_y - 3, 4, 6, 10)
-        pyxel.rect(self.player_x - 4, 120, 8, 8, 6)
+            pyxel.blt(self.player_x - 4, self.bullet_y - 4, 0, 24, 0, 8, 8, colkey=0)
+        pyxel.blt(self.player_x - 4, 118, 0, 8, 0, 8, 8, colkey=0)
         if isinstance(self.phase, Ready):
             pyxel.text(64 - 4 * 8 / 2, 70, f"Stage{self.stage:3d}", 7)
-            pyxel.text(64 - 4 * 14 / 2, 80, f"Shots:{self.shot_num:3d} /{self.max_shot_num:3d}", 7)
+            pyxel.text(
+                64 - 4 * 14 / 2,
+                80,
+                f"Shots:{self.shot_num:3d} /{self.max_shot_num:3d}",
+                7,
+            )
             pyxel.text(64 - 4 * 30 / 2, 90, "Hold [Space] to move and shot!", 7)
         if isinstance(self.phase, Clear):
             pyxel.text(64 - 4 * 15 / 2, 70, f"Stage{self.stage:3d} Clear!", 7)
-            pyxel.text(64 - 4 * 9 / 2, 80, f"Bonus:{self.max_shot_num - self.shot_num:3d}", 7)
+            pyxel.text(
+                64 - 4 * 9 / 2, 80, f"Bonus:{self.max_shot_num - self.shot_num:3d}", 7
+            )
             pyxel.text(64 - 4 * 25 / 2, 90, "Press [Space] to continue", 7)
         if isinstance(self.phase, GameOver):
             pyxel.text(64 - 4 * 10 / 2, 75, f"Game Over!", 7)
@@ -131,7 +140,7 @@ class App:
 
 class Ready(Phase):
     def __init__(self, app: "App"):
-        app.player_x = 4
+        app.player_x = 6
         app.player_vx = 0
         app.shot_num += 1
 
@@ -143,7 +152,7 @@ class Ready(Phase):
 
 class Moving(Phase):
     def __init__(self, app: "App"):
-        pass
+        pyxel.play(0, 0, loop=True)
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btn(pyxel.KEY_SPACE):
@@ -158,6 +167,7 @@ class Stop(Phase):
 
     def __init__(self, app: "App"):
         self.stopped_frame = pyxel.frame_count
+        pyxel.play(0, 5)
 
     def update(self, app: "App") -> "Phase":
         if app.player_vx > 0:
@@ -174,7 +184,8 @@ class Fire(Phase):
     stopped_frame: int
 
     def __init__(self, app: "App"):
-        app.bullet_y = 128
+        pyxel.play(0, 1)
+        app.bullet_y = 120
         app.combo = 0
         app.combo_slidein = None
 
@@ -200,6 +211,8 @@ class Fire(Phase):
 class Clear(Phase):
     def __init__(self, app: "App"):
         app.score += app.max_shot_num - app.shot_num
+        pyxel.play(2, 3)
+        pyxel.play(3, 4)
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btnp(pyxel.KEY_SPACE):
@@ -213,7 +226,8 @@ class Clear(Phase):
 
 class GameOver(Phase):
     def __init__(self, app: "App"):
-        pass
+        pyxel.play(2, 6)
+        pyxel.play(3, 7)
 
     def update(self, app: "App") -> "Phase":
         if pyxel.btnp(pyxel.KEY_SPACE):
